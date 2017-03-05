@@ -272,6 +272,125 @@ uint8_t error_count = 0;
 
 void (*app_start)(void) = 0x0000;
 
+float getTemp()
+{
+  int _val;
+
+  // Command to send to the SHT1x to request Temperature
+  int _gTempCmd  = 3;
+
+  sendCommandSHT(_gTempCmd, _dataPin, _clockPin);
+  waitForResultSHT(_dataPin);
+  _val = getData16SHT(_dataPin, _clockPin);
+  skipCrcSHT(_dataPin, _clockPin);
+
+  return (_val);
+}
+////////////////////////////////////////////////////////////////////////
+int shiftIn(int _dataPin, int _clockPin, int _numBits)// commands for reading/sending data to a SHTx sensor 
+{
+  int ret = 0;
+  int i;
+
+  for (i=0; i<_numBits; ++i)
+  {
+     digitalWrite(_clockPin, HIGH);
+     delay(10);  // I don't know why I need this, but without it I don't get my 8 lsb of temp
+     ret = ret*2 + digitalRead(_dataPin);
+     digitalWrite(_clockPin, LOW);
+  }
+
+  return(ret);
+}
+////////////////////////////////////////////////////////////////////////
+void sendCommandSHT(int _command, int _dataPin, int _clockPin)// send a command to the SHTx sensor 
+{
+  int ack;
+
+  // Transmission Start
+  pinMode(_dataPin, OUTPUT);
+  pinMode(_clockPin, OUTPUT);
+  digitalWrite(_dataPin, HIGH);
+  digitalWrite(_clockPin, HIGH);
+  digitalWrite(_dataPin, LOW);
+  digitalWrite(_clockPin, LOW);
+  digitalWrite(_clockPin, HIGH);
+  digitalWrite(_dataPin, HIGH);
+  digitalWrite(_clockPin, LOW);
+
+  // The command (3 msb are address and must be 000, and last 5 bits are command)
+  shiftOut(_dataPin, _clockPin, MSBFIRST, _command);
+
+  // Verify we get the correct ack
+  digitalWrite(_clockPin, HIGH);
+  pinMode(_dataPin, INPUT);
+  ack = digitalRead(_dataPin);
+  if (ack != LOW) {
+    //Serial.println("Ack Error 0");
+  }
+  digitalWrite(_clockPin, LOW);
+  ack = digitalRead(_dataPin);
+  if (ack != HIGH) {
+    //Serial.println("Ack Error 1");
+  }
+}
+////////////////////////////////////////////////////////////////////////
+void waitForResultSHT(int _dataPin)// wait for the SHTx answer 
+{
+  int i;
+  int ack;
+
+  pinMode(_dataPin, INPUT);
+
+  for(i= 0; i < 100; ++i)
+  {
+    delay(10);
+    ack = digitalRead(_dataPin);
+
+    if (ack == LOW) {
+      break;
+    }
+  }
+
+  if (ack == HIGH) {
+    //Serial.println("Ack Error 2"); // Can't do serial stuff here, need another way of reporting errors
+  }
+}
+////////////////////////////////////////////////////////////////////////
+int getData16SHT(int _dataPin, int _clockPin)// get data from the SHTx sensor 
+{
+  int val; 
+ 
+  // get the MSB (most significant bits) 
+  pinMode(_dataPin, INPUT); 
+  pinMode(_clockPin, OUTPUT); 
+  val = shiftIn(_dataPin, _clockPin, 8); 
+  val *= 256; // this is equivalent to val << 8; 
+  
+  // send the required ACK 
+  pinMode(_dataPin, OUTPUT); 
+  digitalWrite(_dataPin, HIGH); 
+  digitalWrite(_dataPin, LOW); 
+  digitalWrite(_clockPin, HIGH); 
+  digitalWrite(_clockPin, LOW); 
+  
+  // get the LSB (less significant bits) 
+  pinMode(_dataPin, INPUT); 
+  val |= shiftIn(_dataPin, _clockPin, 8); 
+  
+  return val; 
+}
+////////////////////////////////////////////////////////////////////////
+void skipCrcSHT(int _dataPin, int _clockPin)
+{
+  // Skip acknowledge to end trans (no CRC)
+  pinMode(_dataPin, OUTPUT);
+  pinMode(_clockPin, OUTPUT);
+
+  digitalWrite(_dataPin, HIGH);
+  digitalWrite(_clockPin, HIGH);
+  digitalWrite(_clockPin, LOW);
+}
 
 /* main program starts here */
 int main(void)
@@ -440,9 +559,11 @@ int main(void)
     /* DI  connected to 12 -> PD  6 */
 
 	float temp_val = getTemp();
-	char[48] temp_val_string;
-	snprintf(buf, 48, "%f",temp_val);
-	for (i=0;i<48;i++) putch(temp_val_string[i]);
+	int float_size = 48;
+	char[float_size] temp_val_string;
+	snprintf(temp_val_string, float_size, "%f",temp_val);
+	for (i = 0; i < float_size; i++) putch(temp_val_string[i]);
+	putch('\n');
 
     /* Define pull-ups and set outputs high */
     /* Define directions for port pins */

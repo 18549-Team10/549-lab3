@@ -11,6 +11,10 @@
 #define BAUD 115200
 #include <util/setbaud.h>
 
+uint8_t TIMER_COUNTER = 0;
+uint32_t COLOR_COUNTER = 0;
+uint32_t COLOR = 0;
+
 void uart_init(void) {
    UBRR0H = UBRRH_VALUE;
    UBRR0L = UBRRL_VALUE;
@@ -39,6 +43,19 @@ FILE uart_output = FDEV_SETUP_STREAM(uart_putchar, NULL, _FDEV_SETUP_WRITE);
 FILE uart_input = FDEV_SETUP_STREAM(NULL, uart_getchar, _FDEV_SETUP_READ);
 FILE uart_io = FDEV_SETUP_STREAM(uart_putchar, uart_getchar, _FDEV_SETUP_RW);
 
+void colorReset(void) {
+   PORTD = 0;
+   sleep(400);
+}
+
+void interrupt14 timerInterrupt(void) { 
+   TIMER_COUNTER = !TIMER_COUNTER;
+   if (TIMER_COUNTER && (COLOR_COUNTER > 0)) {
+      PORTD = COLOR%2;
+      COLOR >>= 1;
+      COLOR_COUNTER -= 1
+   }
+}
 
 int main(void)
 {
@@ -52,7 +69,7 @@ int main(void)
    uint8_t ACTUATOR_MODE = 1;
    uint8_t BOTH_MODE = 2;
    uint8_t mode = ACTUATOR_MODE;
-   uint32_t color = 0;
+   
 
    char ch;
 
@@ -60,6 +77,9 @@ int main(void)
    DDRB |= (1<<1) | (1<<0);
    PORTB |= (1<<0);
    PORTB &= ~(1<<1);
+
+   // enable interrupts
+   TIMSK1 |= 1;
 
    /* Print hello and then echo serial
    ** port data while blinking LED */
@@ -77,13 +97,17 @@ int main(void)
          putchar('a');
          putchar('\n');
          if (ch == '5') {
-            color = 255<<16;
+            COLOR = 255<<16;
+            COLOR_COUNTER = 24;
          } else if (ch == '6') {
-            color = 255<<8;
+            COLOR = 255<<8;
+            COLOR_COUNTER = 24;
          } else if (ch == '7') {
-            color = 255;
+            COLOR = 255;
+            COLOR_COUNTER = 24;
          } else if (ch == '8') {
-            color = 0;
+            COLOR = 0;
+            COLOR_COUNTER = 24;
          }
          PORTD = color;
 

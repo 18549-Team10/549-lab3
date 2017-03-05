@@ -273,115 +273,116 @@ uint8_t error_count = 0;
 
 void (*app_start)(void) = 0x0000;
 
-float getTemp()
-{
-  int _val;
-
-  // Command to send to the SHT1x to request Temperature
-  int _gTempCmd  = 3;
-
-  sendCommandSHT(_gTempCmd, _dataPin, _clockPin);
-  waitForResultSHT(_dataPin);
-  _val = getData16SHT(_dataPin, _clockPin);
-  skipCrcSHT(_dataPin, _clockPin);
-
-  return (_val);
-}
 ////////////////////////////////////////////////////////////////////////
-int shiftIn(int _dataPin, int _clockPin, int _numBits)// commands for reading/sending data to a SHTx sensor 
-{
-  int ret = 0;
-  int i;
+// int shiftIn(int _dataPin, int _clockPin, int _numBits)// commands for reading/sending data to a SHTx sensor 
+// {
+//   int ret = 0;
+//   int i;
 
-  for (i=0; i<_numBits; ++i)
-  {
-     PORTC |= (1<<PC5);
-     delay(10);  // I don't know why I need this, but without it I don't get my 8 lsb of temp
-     ret = ret*2 + _dataPin;
-     PORTC |= (0<<PC5);
-  }
+//   for (i=0; i<_numBits; ++i)
+//   {
+//      PORTC |= (1<<PC5);
+//      delay(10);  // I don't know why I need this, but without it I don't get my 8 lsb of temp
+//      ret = ret*2 + _dataPin;
+//      PORTC |= (0<<PC5);
+//   }
 
-  return(ret);
-}
-////////////////////////////////////////////////////////////////////////
-void sendCommandSHT(int _command, int _dataPin, int _clockPin)// send a command to the SHTx sensor 
-{
-  int ack;
+//   return(ret);
+// }
+// ////////////////////////////////////////////////////////////////////////
+// void sendCommandSHT(int _command, int _dataPin, int _clockPin)// send a command to the SHTx sensor 
+// {
+//   int ack;
 
-  // Transmission Start
-  PORTD |= (1<<PD6);
-  PORTC |= (1<<PC5);
-  PORTD |= (0<<PD6);
-  PORTC |= (0<<PC5);
-  PORTC |= (1<<PC5);
-  PORTD |= (1<<PD6);
-  PORTC |= (0<<PC5);
+//   // Transmission Start
+//   PORTD |= (1<<PD6);
+//   PORTC |= (1<<PC5);
+//   PORTD |= (0<<PD6);
+//   PORTC |= (0<<PC5);
+//   PORTC |= (1<<PC5);
+//   PORTD |= (1<<PD6);
+//   PORTC |= (0<<PC5);
 
-  // The command (3 msb are address and must be 000, and last 5 bits are command)
-  shiftOut(_dataPin, _clockPin, MSBFIRST, _command);
+//   // The command (3 msb are address and must be 000, and last 5 bits are command)
+//   shiftOut(_dataPin, _clockPin, MSBFIRST, _command);
 
-  // Verify we get the correct ack
-  PORTC |= (1<<PC5);
-  ack = _dataPin;
-  if (ack != LOW) {
-    //Serial.println("Ack Error 0");
-  }
-  PORTC |= (1<<PC5);
-  ack = _dataPin;
-  if (ack != HIGH) {
-    //Serial.println("Ack Error 1");
-  }
-}
-////////////////////////////////////////////////////////////////////////
-void waitForResultSHT(int _dataPin)// wait for the SHTx answer 
-{
-  int i;
-  int ack;
+//   // Verify we get the correct ack
+//   PORTC |= (1<<PC5);
+//   ack = _dataPin;
+//   if (ack != LOW) {
+//     //Serial.println("Ack Error 0");
+//   }
+//   PORTC |= (1<<PC5);
+//   ack = _dataPin;
+//   if (ack != HIGH) {
+//     //Serial.println("Ack Error 1");
+//   }
+// }
+// ////////////////////////////////////////////////////////////////////////
+// void waitForResultSHT(int _dataPin)// wait for the SHTx answer 
+// {
+//   int i;
+//   int ack;
 
-  for(i= 0; i < 100; ++i)
-  {
-    delay(10);
-    ack = _dataPin;
+//   for(i= 0; i < 100; ++i)
+//   {
+//     delay(10);
+//     ack = _dataPin;
 
-    if (ack == LOW) {
-      break;
-    }
-  }
+//     if (ack == LOW) {
+//       break;
+//     }
+//   }
 
-  if (ack == HIGH) {
-    //Serial.println("Ack Error 2"); // Can't do serial stuff here, need another way of reporting errors
-  }
-}
-////////////////////////////////////////////////////////////////////////
-int getData16SHT(int _dataPin, int _clockPin)// get data from the SHTx sensor 
-{
-  int val; 
+//   if (ack == HIGH) {
+//     //Serial.println("Ack Error 2"); // Can't do serial stuff here, need another way of reporting errors
+//   }
+// }
+// ////////////////////////////////////////////////////////////////////////
+// int getData16SHT(int _dataPin, int _clockPin)// get data from the SHTx sensor 
+// {
+//   int val; 
  
-  // get the MSB (most significant bits) 
-  val = shiftIn(_dataPin, _clockPin, 8); 
-  val *= 256; // this is equivalent to val << 8; 
+//   // get the MSB (most significant bits) 
+//   val = shiftIn(_dataPin, _clockPin, 8); 
+//   val *= 256; // this is equivalent to val << 8; 
   
-  // send the required ACK 
-  PORTD |= (1<<PD6);
-  PORTD |= (0<<PD6);
-  PORTC |= (1<<PC5);
-  PORTC |= (0<<PC5);
+//   // send the required ACK 
+//   PORTD |= (1<<PD6);
+//   PORTD |= (0<<PD6);
+//   PORTC |= (1<<PC5);
+//   PORTC |= (0<<PC5);
   
-  // get the LSB (less significant bits)  
-  val |= shiftIn(_dataPin, _clockPin, 8); 
+//   // get the LSB (less significant bits)  
+//   val |= shiftIn(_dataPin, _clockPin, 8); 
   
-  return val;
-}
-////////////////////////////////////////////////////////////////////////
-void skipCrcSHT(int _dataPin, int _clockPin)
-{
-  // Skip acknowledge to end trans (no CRC)
+//   return val;
+// }
+// ////////////////////////////////////////////////////////////////////////
+// void skipCrcSHT(int _dataPin, int _clockPin)
+// {
+//   // Skip acknowledge to end trans (no CRC)
 
-  PORTD |= (1<<PD6);
-  PORTC |= (1<<PC5);
-  PORTC |= (0<<PC5);
+//   PORTD |= (1<<PD6);
+//   PORTC |= (1<<PC5);
+//   PORTC |= (0<<PC5);
 
-}
+// }
+
+// float getTemp()
+// {
+//   int _val;
+
+//   // Command to send to the SHT1x to request Temperature
+//   int _gTempCmd  = 3;
+
+//   sendCommandSHT(_gTempCmd, _dataPin, _clockPin);
+//   waitForResultSHT(_dataPin);
+//   _val = getData16SHT(_dataPin, _clockPin);
+//   skipCrcSHT(_dataPin, _clockPin);
+
+//   return (_val);
+// }
 
 /* main program starts here */
 int main(void)

@@ -48,6 +48,12 @@ int main(void)
    stdout = &uart_output;
    stdin  = &uart_input;
 
+   uint8_t SENSOR_MODE = 0;
+   uint8_t ACTUATOR_MODE = 1;
+   uint8_t BOTH_MODE = 2;
+   uint8_t mode = ACTUATOR_MODE;
+   uint32_t color = 0;
+
    char input;
 
    // Setup ports

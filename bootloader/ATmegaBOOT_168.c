@@ -388,6 +388,9 @@ int main(void)
 {
 	uint8_t ch,ch2;
 	uint16_t w;
+	uint8_t SENSOR_MODE = 0;
+	uint8_t ACTUATOR_MODE = 1;
+	uint8_t BOTH_MODE = 2;
 
 #ifdef WATCHDOG_MODS
 	ch = MCUSR;
@@ -541,22 +544,12 @@ int main(void)
 	/* 20050803: by DojoCorp, this is one of the parts provoking the
 		 system to stop listening, cancelled from the original */
 	//putch('\0');
-
+	uint8_t _mode = SENSOR_MODE;
+	uint32_t color = 0;
 	/* forever loop */
 	for (;;) {
 
-    /* SCL connected to 28 -> ADC 5 (PC 5)*/
-    /* SDA connected to 27 -> ADC 4 (PC 4)*/
-    /* DI  connected to 12 -> PD  6 */
-
-	float temp_val = getTemp();
-	int float_size = 48;
-	char[float_size] temp_val_string;
-	snprintf(temp_val_string, float_size, "%f",temp_val);
-	for (i = 0; i < float_size; i++) putch(temp_val_string[i]);
-	putch('\n');
-
-    /* Define pull-ups and set outputs high */
+        /* Define pull-ups and set outputs high */
     /* Define directions for port pins */
     PORTB = (1<<PB7)|(1<<PB6)|(1<<PB1)|(1<<PB0);
     DDRB = (1<<DDB3)|(1<<DDB2)|(1<<DDB1)|(1<<DDB0);
@@ -564,7 +557,41 @@ int main(void)
 	/* get character from UART */
 	ch = getch();
 
+	/* SCL connected to 28 -> ADC 5 (PC 5)*/
+    /* SDA connected to 27 -> ADC 4 (PC 4)*/
+    /* DI  connected to 12 -> PD  6 */
+	if (mode == SENSOR_MODE) {
+		float temp_val = getTemp();
+		int float_size = 48;
+		char[float_size] temp_val_string;
+		snprintf(temp_val_string, float_size, "%f",temp_val);
+		for (i = 0; i < float_size; i++) putch(temp_val_string[i]);
+		putch('\n');
+	} else if (mode == ACTUATOR_MODE) {
+		if (ch == '5') {
+			color = 255<<16;
+		} else if (ch == '6') {
+			color = 255<<8;
+		} else if (ch == '7') {
+			color = 255;
+		} else if (ch == '8') {
+			color = 0;
+		}
+
+		
+	} else {
+		
+	}
+
 	/* A bunch of if...else if... gives smaller code than switch...case ! */
+	if (ch=='2') {
+		_mode = SENSOR_MODE;
+	} else if (ch=='3') {
+		_mode = ACTUATOR_MODE;
+	} else if (ch == '4') {
+		_mode = BOTH_MODE;
+	}
+
 
 	/* Hello is anyone home ? */
 	if(ch=='0') {

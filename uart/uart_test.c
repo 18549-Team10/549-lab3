@@ -54,7 +54,7 @@ int main(void)
    uint8_t mode = ACTUATOR_MODE;
    uint32_t color = 0;
 
-   char input;
+   char ch;
 
    // Setup ports
    DDRB |= (1<<1) | (1<<0);

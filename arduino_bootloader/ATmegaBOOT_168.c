@@ -113,7 +113,7 @@
 #define BL_PIN  PINF
 #define BL0     PINF7
 #define BL1     PINF6
-#elif defined __AVR_ATmega1280__
+#elif defined __AVR_ATmega1280__ 
 /* we just don't do anything for the MEGA and enter bootloader on reset anyway*/
 #else
 /* other ATmegas have only one UART, so only one pin is defined to enter bootloader */
@@ -133,7 +133,7 @@
 #define LED_PIN  PINB
 #define LED      PINB7
 #else
-/* Onboard LED is connected to pin PB5 in Arduino NG, Diecimila, and Duomilanuove */
+/* Onboard LED is connected to pin PB5 in Arduino NG, Diecimila, and Duomilanuove */ 
 /* other boards like e.g. Crumb8, Crumb168 are using PB2 */
 #define LED_DDR  DDRB
 #define LED_PORT PORTB
@@ -272,125 +272,12 @@ uint8_t error_count = 0;
 
 void (*app_start)(void) = 0x0000;
 
-////////////////////////////////////////////////////////////////////////
-// int shiftIn(int _dataPin, int _clockPin, int _numBits)// commands for reading/sending data to a SHTx sensor 
-// {
-//   int ret = 0;
-//   int i;
-
-//   for (i=0; i<_numBits; ++i)
-//   {
-//      PORTC |= (1<<PC5);
-//      delay(10);  // I don't know why I need this, but without it I don't get my 8 lsb of temp
-//      ret = ret*2 + _dataPin;
-//      PORTC |= (0<<PC5);
-//   }
-
-//   return(ret);
-// }
-// ////////////////////////////////////////////////////////////////////////
-// void sendCommandSHT(int _command, int _dataPin, int _clockPin)// send a command to the SHTx sensor 
-// {
-//   int ack;
-
-//   // Transmission Start
-//   PORTD |= (1<<PD6);
-//   PORTC |= (1<<PC5);
-//   PORTD |= (0<<PD6);
-//   PORTC |= (0<<PC5);
-//   PORTC |= (1<<PC5);
-//   PORTD |= (1<<PD6);
-//   PORTC |= (0<<PC5);
-
-//   // The command (3 msb are address and must be 000, and last 5 bits are command)
-//   shiftOut(_dataPin, _clockPin, MSBFIRST, _command);
-
-//   // Verify we get the correct ack
-//   PORTC |= (1<<PC5);
-//   ack = _dataPin;
-//   if (ack != LOW) {
-//     //Serial.println("Ack Error 0");
-//   }
-//   PORTC |= (1<<PC5);
-//   ack = _dataPin;
-//   if (ack != HIGH) {
-//     //Serial.println("Ack Error 1");
-//   }
-// }
-// ////////////////////////////////////////////////////////////////////////
-// void waitForResultSHT(int _dataPin)// wait for the SHTx answer 
-// {
-//   int i;
-//   int ack;
-
-//   for(i= 0; i < 100; ++i)
-//   {
-//     delay(10);
-//     ack = _dataPin;
-
-//     if (ack == LOW) {
-//       break;
-//     }
-//   }
-
-//   if (ack == HIGH) {
-//     //Serial.println("Ack Error 2"); // Can't do serial stuff here, need another way of reporting errors
-//   }
-// }
-// ////////////////////////////////////////////////////////////////////////
-// int getData16SHT(int _dataPin, int _clockPin)// get data from the SHTx sensor 
-// {
-//   int val; 
- 
-//   // get the MSB (most significant bits) 
-//   val = shiftIn(_dataPin, _clockPin, 8); 
-//   val *= 256; // this is equivalent to val << 8; 
-  
-//   // send the required ACK 
-//   PORTD |= (1<<PD6);
-//   PORTD |= (0<<PD6);
-//   PORTC |= (1<<PC5);
-//   PORTC |= (0<<PC5);
-  
-//   // get the LSB (less significant bits)  
-//   val |= shiftIn(_dataPin, _clockPin, 8); 
-  
-//   return val;
-// }
-// ////////////////////////////////////////////////////////////////////////
-// void skipCrcSHT(int _dataPin, int _clockPin)
-// {
-//   // Skip acknowledge to end trans (no CRC)
-
-//   PORTD |= (1<<PD6);
-//   PORTC |= (1<<PC5);
-//   PORTC |= (0<<PC5);
-
-// }
-
-// float getTemp()
-// {
-//   int _val;
-
-//   // Command to send to the SHT1x to request Temperature
-//   int _gTempCmd  = 3;
-
-//   sendCommandSHT(_gTempCmd, _dataPin, _clockPin);
-//   waitForResultSHT(_dataPin);
-//   _val = getData16SHT(_dataPin, _clockPin);
-//   skipCrcSHT(_dataPin, _clockPin);
-
-//   return (_val);
-// }
 
 /* main program starts here */
 int main(void)
 {
 	uint8_t ch,ch2;
 	uint16_t w;
-	uint8_t SENSOR_MODE = 0;
-	uint8_t ACTUATOR_MODE = 1;
-	uint8_t BOTH_MODE = 2;
 
 #ifdef WATCHDOG_MODS
 	ch = MCUSR;
@@ -456,7 +343,7 @@ int main(void)
 #endif
 	}
 
-#ifdef __AVR_ATmega128__
+#ifdef __AVR_ATmega128__    
 	/* no bootuart was selected, default to uart 0 */
 	if(!bootuart) {
 		bootuart = 1;
@@ -484,7 +371,7 @@ int main(void)
 	UBRR = (uint8_t)(F_CPU/(BAUD_RATE*16L)-1);
 	UBRRHI = (F_CPU/(BAUD_RATE*16L)-1) >> 8;
 	UCSRA = 0x00;
-	UCSRB = _BV(TXEN)|_BV(RXEN);
+	UCSRB = _BV(TXEN)|_BV(RXEN);	
 #elif defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined (__AVR_ATmega328__)
 
 #ifdef DOUBLE_SPEED
@@ -544,58 +431,16 @@ int main(void)
 	/* 20050803: by DojoCorp, this is one of the parts provoking the
 		 system to stop listening, cancelled from the original */
 	//putch('\0');
-	uint8_t mode = SENSOR_MODE;
-	uint32_t color = 0;
+
 	/* forever loop */
 	for (;;) {
-
-        /* Define pull-ups and set outputs high */
-    /* Define directions for port pins */
-    PORTB = (1<<PB7)|(1<<PB6)|(1<<PB1)|(1<<PB0);
-    DDRB = (1<<DDB3)|(1<<DDB2)|(1<<DDB1)|(1<<DDB0);
 
 	/* get character from UART */
 	ch = getch();
 
-	/* SCL connected to 28 -> ADC 5 (PC 5)*/
-    /* SDA connected to 27 -> ADC 4 (PC 4)*/
-    /* DI  connected to 12 -> PD  6 */
-	if (mode == SENSOR_MODE) {
-		/*float temp_val = getTemp();
-		int float_size = 48;
-		char[float_size] temp_val_string;
-		snprintf(temp_val_string, float_size, "%f",temp_val);
-		for (i = 0; i < float_size; i++) putch(temp_val_string[i]);
-		putch('\n');*/
-	} else if (mode == ACTUATOR_MODE) {
-		putch('a');
-		putch('\n');
-		if (ch == '5') {
-			color = 255<<16;
-		} else if (ch == '6') {
-			color = 255<<8;
-		} else if (ch == '7') {
-			color = 255;
-		} else if (ch == '8') {
-			color = 0;
-		}
-		PORTD = color;
-
-	} else {
-		
-	}
-
 	/* A bunch of if...else if... gives smaller code than switch...case ! */
-	if (ch=='2') {
-		mode = SENSOR_MODE;
-	} else if (ch=='3') {
-		mode = ACTUATOR_MODE;
-	} else if (ch == '4') {
-		mode = BOTH_MODE;
-	}
 
-
-	/* Hello is anyone home ? */
+	/* Hello is anyone home ? */ 
 	if(ch=='0') {
 		nothing_response();
 	}
@@ -692,10 +537,10 @@ int main(void)
 			if (ch == 0) {
 				byte_response(SIG1);
 			} else if (ch == 1) {
-				byte_response(SIG2);
+				byte_response(SIG2); 
 			} else {
 				byte_response(SIG3);
-			}
+			} 
 		} else {
 			getNch(3);
 			byte_response(0x00);
@@ -726,7 +571,7 @@ int main(void)
 					eeprom_write_byte((void *)address.word,buff[w]);
 #endif
 					address.word++;
-				}
+				}			
 			}
 			else {					        //Write to FLASH one page at a time
 				if (address.byte[1]>127) address_high = 0x01;	//Only possible with m128, m256 will need 3rd address byte. FIXME
@@ -751,9 +596,9 @@ int main(void)
 					 "ldi	r29,hi8(buff)	\n\t"
 					 "lds	r24,length	\n\t"	//Length of data to be written (in bytes)
 					 "lds	r25,length+1	\n\t"
-					 "length_loop:		\n\t"	//Main loop, repeat for number of words in block
+					 "length_loop:		\n\t"	//Main loop, repeat for number of words in block							 							 
 					 "cpi	r17,0x00	\n\t"	//If page_word_count=0 then erase page
-					 "brne	no_page_erase	\n\t"
+					 "brne	no_page_erase	\n\t"						 
 					 "wait_spm1:		\n\t"
 					 "lds	r16,%0		\n\t"	//Wait for previous spm to complete
 					 "andi	r16,1           \n\t"
@@ -761,7 +606,7 @@ int main(void)
 					 "breq	wait_spm1       \n\t"
 					 "ldi	r16,0x03	\n\t"	//Erase page pointed to by Z
 					 "sts	%0,r16		\n\t"
-					 "spm			\n\t"
+					 "spm			\n\t"							 
 #ifdef __AVR_ATmega163__
 					 ".word 0xFFFF		\n\t"
 					 "nop			\n\t"
@@ -770,19 +615,19 @@ int main(void)
 					 "lds	r16,%0		\n\t"	//Wait for previous spm to complete
 					 "andi	r16,1           \n\t"
 					 "cpi	r16,1           \n\t"
-					 "breq	wait_spm2       \n\t"
+					 "breq	wait_spm2       \n\t"									 
 
 					 "ldi	r16,0x11	\n\t"	//Re-enable RWW section
-					 "sts	%0,r16		\n\t"
+					 "sts	%0,r16		\n\t"						 			 
 					 "spm			\n\t"
 #ifdef __AVR_ATmega163__
 					 ".word 0xFFFF		\n\t"
 					 "nop			\n\t"
 #endif
-					 "no_page_erase:		\n\t"
+					 "no_page_erase:		\n\t"							 
 					 "ld	r0,Y+		\n\t"	//Write 2 bytes into page buffer
-					 "ld	r1,Y+		\n\t"
-
+					 "ld	r1,Y+		\n\t"							 
+								 
 					 "wait_spm3:		\n\t"
 					 "lds	r16,%0		\n\t"	//Wait for previous spm to complete
 					 "andi	r16,1           \n\t"
@@ -791,7 +636,7 @@ int main(void)
 					 "ldi	r16,0x01	\n\t"	//Load r0,r1 into FLASH page buffer
 					 "sts	%0,r16		\n\t"
 					 "spm			\n\t"
-
+								 
 					 "inc	r17		\n\t"	//page_word_count++
 					 "cpi r17,%1	        \n\t"
 					 "brlo	same_page	\n\t"	//Still same page in FLASH
@@ -804,7 +649,7 @@ int main(void)
 					 "breq	wait_spm4       \n\t"
 #ifdef __AVR_ATmega163__
 					 "andi	r30,0x80	\n\t"	// m163 requires Z6:Z1 to be zero during page write
-#endif
+#endif							 							 
 					 "ldi	r16,0x05	\n\t"	//Write page pointed to by Z
 					 "sts	%0,r16		\n\t"
 					 "spm			\n\t"
@@ -817,15 +662,15 @@ int main(void)
 					 "lds	r16,%0		\n\t"	//Wait for previous spm to complete
 					 "andi	r16,1           \n\t"
 					 "cpi	r16,1           \n\t"
-					 "breq	wait_spm5       \n\t"
+					 "breq	wait_spm5       \n\t"									 
 					 "ldi	r16,0x11	\n\t"	//Re-enable RWW section
-					 "sts	%0,r16		\n\t"
-					 "spm			\n\t"
+					 "sts	%0,r16		\n\t"						 			 
+					 "spm			\n\t"					 		 
 #ifdef __AVR_ATmega163__
 					 ".word 0xFFFF		\n\t"
 					 "nop			\n\t"
 #endif
-					 "same_page:		\n\t"
+					 "same_page:		\n\t"							 
 					 "adiw	r30,2		\n\t"	//Next word in FLASH
 					 "sbiw	r24,2		\n\t"	//length-2
 					 "breq	final_write	\n\t"	//Finished
@@ -851,7 +696,7 @@ int main(void)
 		} else {
 			if (++error_count == MAX_ERROR_COUNT)
 				app_start();
-		}
+		}		
 	}
 
 
@@ -916,7 +761,7 @@ int main(void)
 	}
 
 
-#if defined MONITOR
+#if defined MONITOR 
 
 	/* here come the extended monitor commands by Erik Lins */
 
@@ -938,7 +783,7 @@ int main(void)
 			welcome = "ATmegaBOOT / PROBOmega128 - (C) J.P.Kyle, E.Lins - 050815\n\r";
 #elif defined SAVVY128
 			welcome = "ATmegaBOOT / Savvy128 - (C) J.P.Kyle, E.Lins - 050815\n\r";
-#elif defined __AVR_ATmega1280__
+#elif defined __AVR_ATmega1280__ 
 			welcome = "ATmegaBOOT / Arduino Mega - (C) Arduino LLC - 090930\n\r";
 #endif
 
@@ -970,7 +815,7 @@ int main(void)
 						LED_PORT |= _BV(LED);
 						putch('0');
 					}
-				}
+				} 
 
 				/* read byte from address */
 				else if(ch == 'r') {
@@ -1062,14 +907,14 @@ void puthex(char ch) {
 	} else {
 		ah += '0';
 	}
-
+	
 	ch &= 0x0f;
 	if(ch >= 0x0a) {
 		ch = ch - 0x0a + 'a';
 	} else {
 		ch += '0';
 	}
-
+	
 	putch(ah);
 	putch(ch);
 }
@@ -1103,7 +948,7 @@ char getch(void)
 	uint32_t count = 0;
 	if(bootuart == 1) {
 		while(!(UCSR0A & _BV(RXC0))) {
-			/* 20060803 DojoCorp:: Addon coming from the previous Bootloader*/
+			/* 20060803 DojoCorp:: Addon coming from the previous Bootloader*/               
 			/* HACKME:: here is a good place to count times*/
 			count++;
 			if (count > MAX_TIME_COUNT)
@@ -1114,7 +959,7 @@ char getch(void)
 	}
 	else if(bootuart == 2) {
 		while(!(UCSR1A & _BV(RXC1))) {
-			/* 20060803 DojoCorp:: Addon coming from the previous Bootloader*/
+			/* 20060803 DojoCorp:: Addon coming from the previous Bootloader*/               
 			/* HACKME:: here is a good place to count times*/
 			count++;
 			if (count > MAX_TIME_COUNT)
@@ -1127,7 +972,7 @@ char getch(void)
 #elif defined(__AVR_ATmega168__)  || defined(__AVR_ATmega328P__) || defined (__AVR_ATmega328__)
 	uint32_t count = 0;
 	while(!(UCSR0A & _BV(RXC0))){
-		/* 20060803 DojoCorp:: Addon coming from the previous Bootloader*/
+		/* 20060803 DojoCorp:: Addon coming from the previous Bootloader*/               
 		/* HACKME:: here is a good place to count times*/
 		count++;
 		if (count > MAX_TIME_COUNT)
@@ -1138,7 +983,7 @@ char getch(void)
 	/* m8,16,32,169,8515,8535,163 */
 	uint32_t count = 0;
 	while(!(UCSRA & _BV(RXC))){
-		/* 20060803 DojoCorp:: Addon coming from the previous Bootloader*/
+		/* 20060803 DojoCorp:: Addon coming from the previous Bootloader*/               
 		/* HACKME:: here is a good place to count times*/
 		count++;
 		if (count > MAX_TIME_COUNT)
@@ -1156,7 +1001,7 @@ void getNch(uint8_t count)
 		if(bootuart == 1) {
 			while(!(UCSR0A & _BV(RXC0)));
 			UDR0;
-		}
+		} 
 		else if(bootuart == 2) {
 			while(!(UCSR1A & _BV(RXC1)));
 			UDR1;
@@ -1165,11 +1010,11 @@ void getNch(uint8_t count)
 		getch();
 #else
 		/* m8,16,32,169,8515,8535,163 */
-		/* 20060803 DojoCorp:: Addon coming from the previous Bootloader*/
+		/* 20060803 DojoCorp:: Addon coming from the previous Bootloader*/               
 		//while(!(UCSRA & _BV(RXC)));
 		//UDR;
 		getch(); // need to handle time out
-#endif
+#endif		
 	}
 }
 

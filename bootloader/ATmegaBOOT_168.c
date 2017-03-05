@@ -70,6 +70,7 @@
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
 #include <util/delay.h>
+#include <unistd.h>
 
 /* the current avr-libc eeprom functions do not support the ATmega168 */
 /* own eeprom write/read functions are used instead */
@@ -294,10 +295,10 @@ int shiftIn(int _dataPin, int _clockPin, int _numBits)// commands for reading/se
 
   for (i=0; i<_numBits; ++i)
   {
-     digitalWrite(_clockPin, HIGH);
+     PORTC |= (1<<PC5);
      delay(10);  // I don't know why I need this, but without it I don't get my 8 lsb of temp
-     ret = ret*2 + digitalRead(_dataPin);
-     digitalWrite(_clockPin, LOW);
+     ret = ret*2 + _dataPin;
+     PORTC |= (0<<PC5);
   }
 
   return(ret);
@@ -308,28 +309,25 @@ void sendCommandSHT(int _command, int _dataPin, int _clockPin)// send a command 
   int ack;
 
   // Transmission Start
-  pinMode(_dataPin, OUTPUT);
-  pinMode(_clockPin, OUTPUT);
-  digitalWrite(_dataPin, HIGH);
-  digitalWrite(_clockPin, HIGH);
-  digitalWrite(_dataPin, LOW);
-  digitalWrite(_clockPin, LOW);
-  digitalWrite(_clockPin, HIGH);
-  digitalWrite(_dataPin, HIGH);
-  digitalWrite(_clockPin, LOW);
+  PORTD |= (1<<PD6);
+  PORTC |= (1<<PC5);
+  PORTD |= (0<<PD6);
+  PORTC |= (0<<PC5);
+  PORTC |= (1<<PC5);
+  PORTD |= (1<<PD6);
+  PORTC |= (0<<PC5);
 
   // The command (3 msb are address and must be 000, and last 5 bits are command)
   shiftOut(_dataPin, _clockPin, MSBFIRST, _command);
 
   // Verify we get the correct ack
-  digitalWrite(_clockPin, HIGH);
-  pinMode(_dataPin, INPUT);
-  ack = digitalRead(_dataPin);
+  PORTC |= (1<<PC5);
+  ack = _dataPin;
   if (ack != LOW) {
     //Serial.println("Ack Error 0");
   }
-  digitalWrite(_clockPin, LOW);
-  ack = digitalRead(_dataPin);
+  PORTC |= (1<<PC5);
+  ack = _dataPin;
   if (ack != HIGH) {
     //Serial.println("Ack Error 1");
   }
@@ -340,12 +338,10 @@ void waitForResultSHT(int _dataPin)// wait for the SHTx answer
   int i;
   int ack;
 
-  pinMode(_dataPin, INPUT);
-
   for(i= 0; i < 100; ++i)
   {
     delay(10);
-    ack = digitalRead(_dataPin);
+    ack = _dataPin;
 
     if (ack == LOW) {
       break;
@@ -362,20 +358,16 @@ int getData16SHT(int _dataPin, int _clockPin)// get data from the SHTx sensor
   int val; 
  
   // get the MSB (most significant bits) 
-  pinMode(_dataPin, INPUT); 
-  pinMode(_clockPin, OUTPUT); 
   val = shiftIn(_dataPin, _clockPin, 8); 
   val *= 256; // this is equivalent to val << 8; 
   
   // send the required ACK 
-  pinMode(_dataPin, OUTPUT); 
-  digitalWrite(_dataPin, HIGH); 
-  digitalWrite(_dataPin, LOW); 
-  digitalWrite(_clockPin, HIGH); 
-  digitalWrite(_clockPin, LOW); 
+  PORTD |= (1<<PD6);
+  PORTD |= (0<<PD6);
+  PORTC |= (1<<PC5);
+  PORTC |= (0<<PC5);
   
-  // get the LSB (less significant bits) 
-  pinMode(_dataPin, INPUT); 
+  // get the LSB (less significant bits)  
   val |= shiftIn(_dataPin, _clockPin, 8); 
   
   return val; 
@@ -384,12 +376,11 @@ int getData16SHT(int _dataPin, int _clockPin)// get data from the SHTx sensor
 void skipCrcSHT(int _dataPin, int _clockPin)
 {
   // Skip acknowledge to end trans (no CRC)
-  pinMode(_dataPin, OUTPUT);
-  pinMode(_clockPin, OUTPUT);
 
-  digitalWrite(_dataPin, HIGH);
-  digitalWrite(_clockPin, HIGH);
-  digitalWrite(_clockPin, LOW);
+  PORTD |= (1<<PD6);
+  PORTC |= (1<<PC5);
+  PORTC |= (0<<PC5);
+
 }
 
 /* main program starts here */

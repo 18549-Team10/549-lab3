@@ -67,6 +67,7 @@ int main(void)
    while(1) {
       ch = getchar();
       if (mode == SENSOR_MODE) {
+         putchar('s');
          /*float temp_val = getTemp();
          int float_size = 48;
          char[float_size] temp_val_string;
@@ -88,7 +89,7 @@ int main(void)
          PORTD = color;
 
       } else {
-         
+         putchar('b');
       }
 
       /* A bunch of if...else if... gives smaller code than switch...case ! */

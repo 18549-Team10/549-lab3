@@ -70,6 +70,7 @@
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
 #include <util/delay.h>
+#include <unistd.h>
 
 /* the current avr-libc eeprom functions do not support the ATmega168 */
 /* own eeprom write/read functions are used instead */
@@ -272,12 +273,124 @@ uint8_t error_count = 0;
 
 void (*app_start)(void) = 0x0000;
 
+float getTemp()
+{
+  int _val;
+
+  // Command to send to the SHT1x to request Temperature
+  int _gTempCmd  = 3;
+
+  sendCommandSHT(_gTempCmd, _dataPin, _clockPin);
+  waitForResultSHT(_dataPin);
+  _val = getData16SHT(_dataPin, _clockPin);
+  skipCrcSHT(_dataPin, _clockPin);
+
+  return (_val);
+}
+////////////////////////////////////////////////////////////////////////
+int shiftIn(int _dataPin, int _clockPin, int _numBits)// commands for reading/sending data to a SHTx sensor 
+{
+  int ret = 0;
+  int i;
+
+  for (i=0; i<_numBits; ++i)
+  {
+     PORTC |= (1<<PC5);
+     delay(10);  // I don't know why I need this, but without it I don't get my 8 lsb of temp
+     ret = ret*2 + _dataPin;
+     PORTC |= (0<<PC5);
+  }
+
+  return(ret);
+}
+////////////////////////////////////////////////////////////////////////
+void sendCommandSHT(int _command, int _dataPin, int _clockPin)// send a command to the SHTx sensor 
+{
+  int ack;
+
+  // Transmission Start
+  PORTD |= (1<<PD6);
+  PORTC |= (1<<PC5);
+  PORTD |= (0<<PD6);
+  PORTC |= (0<<PC5);
+  PORTC |= (1<<PC5);
+  PORTD |= (1<<PD6);
+  PORTC |= (0<<PC5);
+
+  // The command (3 msb are address and must be 000, and last 5 bits are command)
+  shiftOut(_dataPin, _clockPin, MSBFIRST, _command);
+
+  // Verify we get the correct ack
+  PORTC |= (1<<PC5);
+  ack = _dataPin;
+  if (ack != LOW) {
+    //Serial.println("Ack Error 0");
+  }
+  PORTC |= (1<<PC5);
+  ack = _dataPin;
+  if (ack != HIGH) {
+    //Serial.println("Ack Error 1");
+  }
+}
+////////////////////////////////////////////////////////////////////////
+void waitForResultSHT(int _dataPin)// wait for the SHTx answer 
+{
+  int i;
+  int ack;
+
+  for(i= 0; i < 100; ++i)
+  {
+    delay(10);
+    ack = _dataPin;
+
+    if (ack == LOW) {
+      break;
+    }
+  }
+
+  if (ack == HIGH) {
+    //Serial.println("Ack Error 2"); // Can't do serial stuff here, need another way of reporting errors
+  }
+}
+////////////////////////////////////////////////////////////////////////
+int getData16SHT(int _dataPin, int _clockPin)// get data from the SHTx sensor 
+{
+  int val; 
+ 
+  // get the MSB (most significant bits) 
+  val = shiftIn(_dataPin, _clockPin, 8); 
+  val *= 256; // this is equivalent to val << 8; 
+  
+  // send the required ACK 
+  PORTD |= (1<<PD6);
+  PORTD |= (0<<PD6);
+  PORTC |= (1<<PC5);
+  PORTC |= (0<<PC5);
+  
+  // get the LSB (less significant bits)  
+  val |= shiftIn(_dataPin, _clockPin, 8); 
+  
+  return val;
+}
+////////////////////////////////////////////////////////////////////////
+void skipCrcSHT(int _dataPin, int _clockPin)
+{
+  // Skip acknowledge to end trans (no CRC)
+
+  PORTD |= (1<<PD6);
+  PORTC |= (1<<PC5);
+  PORTC |= (0<<PC5);
+
+}
 
 /* main program starts here */
 int main(void)
 {
 	uint8_t ch,ch2;
 	uint16_t w;
+	uint8_t SENSOR_MODE = 0;
+	uint8_t ACTUATOR_MODE = 1;
+	uint8_t BOTH_MODE = 2;
 
 #ifdef WATCHDOG_MODS
 	ch = MCUSR;
@@ -431,15 +544,12 @@ int main(void)
 	/* 20050803: by DojoCorp, this is one of the parts provoking the
 		 system to stop listening, cancelled from the original */
 	//putch('\0');
-
+	uint8_t _mode = SENSOR_MODE;
+	uint32_t color = 0;
 	/* forever loop */
 	for (;;) {
 
-    /* SCL connected to 28 -> ADC 5 (PC 5)*/
-    /* SDA connected to 27 -> ADC 4 (PC 4)*/
-    /* DI  connected to 12 -> PD  6 */
-
-    /* Define pull-ups and set outputs high */
+        /* Define pull-ups and set outputs high */
     /* Define directions for port pins */
     PORTB = (1<<PB7)|(1<<PB6)|(1<<PB1)|(1<<PB0);
     DDRB = (1<<DDB3)|(1<<DDB2)|(1<<DDB1)|(1<<DDB0);
@@ -447,7 +557,43 @@ int main(void)
 	/* get character from UART */
 	ch = getch();
 
+	/* SCL connected to 28 -> ADC 5 (PC 5)*/
+    /* SDA connected to 27 -> ADC 4 (PC 4)*/
+    /* DI  connected to 12 -> PD  6 */
+	if (mode == SENSOR_MODE) {
+		/*float temp_val = getTemp();
+		int float_size = 48;
+		char[float_size] temp_val_string;
+		snprintf(temp_val_string, float_size, "%f",temp_val);
+		for (i = 0; i < float_size; i++) putch(temp_val_string[i]);
+		putch('\n');*/
+	} else if (mode == ACTUATOR_MODE) {
+		putch('a');
+		putch('\n');
+		if (ch == '5') {
+			color = 255<<16;
+		} else if (ch == '6') {
+			color = 255<<8;
+		} else if (ch == '7') {
+			color = 255;
+		} else if (ch == '8') {
+			color = 0;
+		}
+		PORTD = color;
+
+	} else {
+		
+	}
+
 	/* A bunch of if...else if... gives smaller code than switch...case ! */
+	if (ch=='2') {
+		_mode = SENSOR_MODE;
+	} else if (ch=='3') {
+		_mode = ACTUATOR_MODE;
+	} else if (ch == '4') {
+		_mode = BOTH_MODE;
+	}
+
 
 	/* Hello is anyone home ? */
 	if(ch=='0') {

@@ -273,20 +273,6 @@ uint8_t error_count = 0;
 
 void (*app_start)(void) = 0x0000;
 
-float getTemp()
-{
-  int _val;
-
-  // Command to send to the SHT1x to request Temperature
-  int _gTempCmd  = 3;
-
-  sendCommandSHT(_gTempCmd, _dataPin, _clockPin);
-  waitForResultSHT(_dataPin);
-  _val = getData16SHT(_dataPin, _clockPin);
-  skipCrcSHT(_dataPin, _clockPin);
-
-  return (_val);
-}
 ////////////////////////////////////////////////////////////////////////
 int shiftIn(int _dataPin, int _clockPin, int _numBits)// commands for reading/sending data to a SHTx sensor 
 {
@@ -381,6 +367,21 @@ void skipCrcSHT(int _dataPin, int _clockPin)
   PORTC |= (1<<PC5);
   PORTC |= (0<<PC5);
 
+}
+
+float getTemp()
+{
+  int _val;
+
+  // Command to send to the SHT1x to request Temperature
+  int _gTempCmd  = 3;
+
+  sendCommandSHT(_gTempCmd, _dataPin, _clockPin);
+  waitForResultSHT(_dataPin);
+  _val = getData16SHT(_dataPin, _clockPin);
+  skipCrcSHT(_dataPin, _clockPin);
+
+  return (_val);
 }
 
 /* main program starts here */

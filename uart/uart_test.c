@@ -44,19 +44,19 @@ FILE uart_input = FDEV_SETUP_STREAM(NULL, uart_getchar, _FDEV_SETUP_READ);
 FILE uart_io = FDEV_SETUP_STREAM(uart_putchar, uart_getchar, _FDEV_SETUP_RW);
 
 void colorReset(void) {
-   PORTD = 0;
-   sleep(400);
+   PORTD &= ~(1<<6);
+   //sleep(400);
 }
-
-void interrupt14 timerInterrupt(void) { 
+/*
+ISR(TIMER0_OVF_vect, ISR_NAKED) { 
    TIMER_COUNTER = !TIMER_COUNTER;
    if (TIMER_COUNTER && (COLOR_COUNTER > 0)) {
       PORTD = COLOR%2;
       COLOR >>= 1;
-      COLOR_COUNTER -= 1
+      COLOR_COUNTER -= 1;
    }
 }
-
+*/
 int main(void)
 {
 
@@ -84,6 +84,7 @@ int main(void)
    /* Print hello and then echo serial
    ** port data while blinking LED */
    printf("Hello world!\r\n");
+   colorReset();
    while(1) {
       ch = getchar();
       if (mode == SENSOR_MODE) {
@@ -110,7 +111,7 @@ int main(void)
             COLOR = 0;
             COLOR_COUNTER = 24;
          }
-         PORTD = color;
+        PORTD |= 1<<6;
 
       } else {
          putchar('b');

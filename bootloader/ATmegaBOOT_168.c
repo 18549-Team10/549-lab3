@@ -554,19 +554,22 @@ int main(void)
     PORTB = (1<<PB7)|(1<<PB6)|(1<<PB1)|(1<<PB0);
     DDRB = (1<<DDB3)|(1<<DDB2)|(1<<DDB1)|(1<<DDB0);
 
+
 	/* get character from UART */
 	ch = getch();
 
 	/* SCL connected to 28 -> ADC 5 (PC 5)*/
     /* SDA connected to 27 -> ADC 4 (PC 4)*/
     /* DI  connected to 12 -> PD  6 */
-	if (mode == SENSOR_MODE) {
-		/*float temp_val = getTemp();
+    
+    	
+/*    if (mode == SENSOR_MODE) {
+		*float temp_val = getTemp();
 		int float_size = 48;
 		char[float_size] temp_val_string;
 		snprintf(temp_val_string, float_size, "%f",temp_val);
 		for (i = 0; i < float_size; i++) putch(temp_val_string[i]);
-		putch('\n');*/
+		putch('\n');
 	} else if (mode == ACTUATOR_MODE) {
 		putch('a');
 		putch('\n');
@@ -585,7 +588,7 @@ int main(void)
 		
 	}
 
-	/* A bunch of if...else if... gives smaller code than switch...case ! */
+	/* A bunch of if...else if... gives smaller code than switch...case ! 
 	if (ch=='2') {
 		mode = SENSOR_MODE;
 	} else if (ch=='3') {
@@ -594,7 +597,7 @@ int main(void)
 		mode = BOTH_MODE;
 	}
 
-
+*/
 	/* Hello is anyone home ? */
 	if(ch=='0') {
 		nothing_response();

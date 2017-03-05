@@ -57,6 +57,14 @@ ISR(TIMER0_OVF_vect, ISR_NAKED) {
    }
 }
 */
+
+/*
+
+void interrupt22 adcInterrupt(void) {
+   printf("Reached the ADC interrupt...");
+}
+*/
+
 int main(void)
 {
 
@@ -80,6 +88,14 @@ int main(void)
 
    // enable interrupts
    TIMSK1 |= 1;
+
+   // ADC interrupt
+   ADATE |= 1;
+
+   // Trigger select bits for ADC
+   ADTS2 |= 0;
+   ADTS1 |= 0;
+   ADTS0 |= 0;
 
    /* Print hello and then echo serial
    ** port data while blinking LED */

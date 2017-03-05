@@ -370,7 +370,7 @@ int getData16SHT(int _dataPin, int _clockPin)// get data from the SHTx sensor
   // get the LSB (less significant bits)  
   val |= shiftIn(_dataPin, _clockPin, 8); 
   
-  return val; 
+  return val;
 }
 ////////////////////////////////////////////////////////////////////////
 void skipCrcSHT(int _dataPin, int _clockPin)
@@ -561,13 +561,15 @@ int main(void)
     /* SDA connected to 27 -> ADC 4 (PC 4)*/
     /* DI  connected to 12 -> PD  6 */
 	if (mode == SENSOR_MODE) {
-		float temp_val = getTemp();
+		/*float temp_val = getTemp();
 		int float_size = 48;
 		char[float_size] temp_val_string;
 		snprintf(temp_val_string, float_size, "%f",temp_val);
 		for (i = 0; i < float_size; i++) putch(temp_val_string[i]);
-		putch('\n');
+		putch('\n');*/
 	} else if (mode == ACTUATOR_MODE) {
+		putch('a');
+		putch('\n');
 		if (ch == '5') {
 			color = 255<<16;
 		} else if (ch == '6') {
@@ -577,8 +579,8 @@ int main(void)
 		} else if (ch == '8') {
 			color = 0;
 		}
+		PORTD = color;
 
-		
 	} else {
 		
 	}

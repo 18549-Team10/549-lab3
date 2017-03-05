@@ -439,6 +439,11 @@ int main(void)
     /* SDA connected to 27 -> ADC 4 (PC 4)*/
     /* DI  connected to 12 -> PD  6 */
 
+	float temp_val = getTemp();
+	char[48] temp_val_string;
+	snprintf(buf, 48, "%f",temp_val);
+	for (i=0;i<48;i++) putch(temp_val_string[i]);
+
     /* Define pull-ups and set outputs high */
     /* Define directions for port pins */
     PORTB = (1<<PB7)|(1<<PB6)|(1<<PB1)|(1<<PB0);

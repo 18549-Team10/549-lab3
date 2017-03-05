@@ -59,9 +59,39 @@ int main(void)
    ** port data while blinking LED */
    printf("Hello world!\r\n");
    while(1) {
-      input = getchar();
-      printf("You wrote %c\r\n", input);
-      PORTB ^= 0x01;
-   }
+      ch = getchar();
+      if (mode == SENSOR_MODE) {
+         /*float temp_val = getTemp();
+         int float_size = 48;
+         char[float_size] temp_val_string;
+         snprintf(temp_val_string, float_size, "%f",temp_val);
+         for (i = 0; i < float_size; i++) putch(temp_val_string[i]);
+         putch('\n');*/
+      } else if (mode == ACTUATOR_MODE) {
+         putchar('a');
+         putchar('\n');
+         if (ch == '5') {
+            color = 255<<16;
+         } else if (ch == '6') {
+            color = 255<<8;
+         } else if (ch == '7') {
+            color = 255;
+         } else if (ch == '8') {
+            color = 0;
+         }
+         PORTD = color;
 
+      } else {
+         
+      }
+
+      /* A bunch of if...else if... gives smaller code than switch...case ! */
+      if (ch=='2') {
+         mode = SENSOR_MODE;
+      } else if (ch=='3') {
+         mode = ACTUATOR_MODE;
+      } else if (ch == '4') {
+         mode = BOTH_MODE;
+      }
+   }
 }

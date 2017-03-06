@@ -32,6 +32,7 @@
   -------------------------------------------------------------------------*/
 
 #include "Adafruit_NeoPixel.h"
+#include <stdint.h>
 
 #define TO_CPP(a) (reinterpret_cast<Adafruit_NeoPixel*>(a))
 #define TO_C(a)   (reinterpret_cast<adafruit_NeoPixel*>(a))

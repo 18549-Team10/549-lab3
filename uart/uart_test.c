@@ -62,16 +62,6 @@ void pwm_init(void){
   TIMSK0 |= (1<<OCIE0A); //Enable interrupts
 }
 
-ISR(TIMER0_COMPA_vect , ISR_NAKED) {
-  if(OCR0A == 0x6)
-  {
-    OCR0A = 0x4;
-  }
-  else
-  {
-    OCR0A = 0x6;
-  }
-}
 
 /*
 ISR(TIMER0_OVF_vect, ISR_NAKED) {

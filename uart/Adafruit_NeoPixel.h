@@ -23,6 +23,7 @@
 #if (ARDUINO >= 100)
  #include <Arduino.h>
 #else
+ #include "/home/jwbird/arduino-1.8.1/hardware/arduino/avr/cores/arduino/Arduino.h"
  #include "pins_arduino.h"
 #endif
 

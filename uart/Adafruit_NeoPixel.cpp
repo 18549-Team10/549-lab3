@@ -933,29 +933,29 @@ struct adafruit_NeoPixel* adafruit_NeoPixelInit(uint16_t n, uint8_t p, uint8_t t
   return a;
 }
 
-void neoPixel_begin(adafruit_NeoPixel *a) {
+void neoPixel_begin(struct adafruit_NeoPixel *a) {
   TO_CPP(a).begin();
 }
 
-void neoPixel_show(adafruit_NeoPixel *a) {
+void neoPixel_show(struct adafruit_NeoPixel *a) {
   TO_CPP(a).show();
 }
 
-void neoPixel_setPixelColor(adafruit_NeoPixel *a, uint16_t n, uint8_t r, uint8_t g, uint8_t b) {
+void neoPixel_setPixelColor(struct adafruit_NeoPixel *a, uint16_t n, uint8_t r, uint8_t g, uint8_t b) {
   TO_CPP(a).setPixelColor(n,r,g,b); 
 }
 
-void neoPixel_setBrightness(adafruit_NeoPixel *a, uint8_t) {
+void neoPixel_setBrightness(struct adafruit_NeoPixel *a, uint8_t t) {
   TO_CPP(a).setBrightness(t); 
 }
 
-uint16_t neoPixel_numPixels(adafruit_NeoPixel *a) {
+uint16_t neoPixel_numPixels(struct adafruit_NeoPixel *a) {
   TO_CPP(a).numPixels();
 }
-static uint32_t neoPixel_Color(adafruit_NeoPixel *a, uint8_t r, uint8_t g, uint8_t b) {
+static uint32_t neoPixel_Color(struct adafruit_NeoPixel *a, uint8_t r, uint8_t g, uint8_t b) {
   TO_CPP(a).Color(r,g,b);
 }
 
-uint32_t neoPixel_getPixelColor(adafruit_NeoPixel *a, uint16_t n) {
+uint32_t neoPixel_getPixelColor(struct adafruit_NeoPixel *a, uint16_t n) {
   TO_CPP(a).getPixelColor(n);
 }

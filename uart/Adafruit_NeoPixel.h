@@ -84,13 +84,13 @@ extern "C" {
 struct adafruit_NeoPixel;
 
 struct adafruit_NeoPixel* adafruit_NeoPixelInit(uint16_t n, uint8_t p, uint8_t t);
-void neoPixel_begin(void);
-void neoPixel_show(void);
-void neoPixel_setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b);
-void neoPixel_setBrightness(uint8_t);
-uint16_t neoPixel_numPixels(void);
-static uint32_t neoPixel_Color(uint8_t r, uint8_t g, uint8_t b);
-uint32_t neoPixel_getPixelColor(uint16_t n);
+void neoPixel_begin(struct adafruit_NeoPixel *a);
+void neoPixel_show(struct adafruit_NeoPixel *a);
+void neoPixel_setPixelColor(struct adafruit_NeoPixel *a, uint16_t n, uint8_t r, uint8_t g, uint8_t b);
+void neoPixel_setBrightness(struct adafruit_NeoPixel *a, uint8_t t);
+uint16_t neoPixel_numPixels(struct adafruit_NeoPixel *a);
+static uint32_t neoPixel_Color(struct adafruit_NeoPixel *a, uint8_t r, uint8_t g, uint8_t b);
+uint32_t neoPixel_getPixelColor(struct adafruit_NeoPixel *a, uint16_t n);
 
 #ifdef __cplusplus
 }

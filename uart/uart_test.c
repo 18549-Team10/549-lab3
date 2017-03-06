@@ -8,12 +8,10 @@
 #include <util/delay.h>
 #include <stdio.h>
 
+#include "Adafruit_NeoPixel.h"
+
 #define BAUD 115200
 #include <util/setbaud.h>
-
-uint8_t TIMER_COUNTER = 0;
-uint32_t COLOR_COUNTER = 0;
-uint32_t COLOR = 0;
 
 void uart_init(void) {
    UBRR0H = UBRRH_VALUE;
@@ -92,6 +90,11 @@ void interrupt22 adcInterrupt(void) {
 }
 */
 
+void c_function(Adafruit_NeoPixel* Adafruit_NeoPixel)
+{
+  cplusplus_callback_function(Adafruit_NeoPixel);
+}
+
 int main(void)
 {
 
@@ -133,6 +136,7 @@ int main(void)
 
   pwm_init();
 
+  Adafruit_NeoPixel led = Adafruit_NeoPixel(LED_COUNT, PIN, NEO_GRB + NEO_KHZ800);
   while(1) {
     ch = getchar();
     PORTD |= 1<<PD6; //just see if we get light
@@ -148,17 +152,17 @@ int main(void)
       putchar('a');
       putchar('\n');
       if (ch == '5') {
-        COLOR = 255<<16;
-        COLOR_COUNTER = 24;
+        led.setPixelColor(0,RED);
+        led.show();
       } else if (ch == '6') {
-        COLOR = 255<<8;
-        COLOR_COUNTER = 24;
+        led.setPixelColor(0,BLUE);
+        led.show();
       } else if (ch == '7') {
-        COLOR = 255;
-        COLOR_COUNTER = 24;
+        led.setPixelColor(0,GREEN);
+        led.show();
       } else if (ch == '8') {
-        COLOR = 0;
-        COLOR_COUNTER = 24;
+        led.setPixelColor(0,0);
+        led.show();
       }
 
     } else {

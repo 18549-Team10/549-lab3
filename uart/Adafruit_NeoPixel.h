@@ -83,7 +83,7 @@ extern "C" {
 
 struct adafruit_NeoPixel;
 
-struct adafruit_NeoPixel* adafruit_NeoPixel(uint16_t n, uint8_t p, uint8_t t);
+struct adafruit_NeoPixel* adafruit_NeoPixelInit(uint16_t n, uint8_t p, uint8_t t);
 void neoPixel_begin(void);
 void neoPixel_show(void);
 void neoPixel_setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b);

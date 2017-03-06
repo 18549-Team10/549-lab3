@@ -130,7 +130,7 @@ int main(void)
    ** port data while blinking LED */
   printf("Hello world!\r\n");
   pwm_init();
-  adafruit_NeoPixel *led = adafruit_NeoPixel(LED_COUNT, PIN, NEO_GRB + NEO_KHZ800);
+  struct adafruit_NeoPixel *led = adafruit_NeoPixelInit(LED_COUNT, PIN, NEO_GRB + NEO_KHZ800);
   while(1) {
       ch = getchar();
       //PORTD |= 1<<PD6; //just see if we get light

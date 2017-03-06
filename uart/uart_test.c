@@ -8,12 +8,10 @@
 #include <util/delay.h>
 #include <stdio.h>
 
-#include "Adafruit_NeoPixel.h"
 
 #define BAUD 115200
 #include <util/setbaud.h>
 
-#use delay(clock=48000000,crystal=20000000)
 
 uint8_t NeoGreen;
 uint8_t NeoBlue;
@@ -90,24 +88,24 @@ void interrupt22 adcInterrupt(void) {
 void neoBit (int bit) // TODO: revisit delay_cycles values
 {
    if (bit == 1)
-   { PORTD |= (1<<PD6); _delay_us(0.4); PORTD &= ~(1<<PD6); _delay_us(.85)} // delay_cycles (3); // Bit '1'   
+   { PORTD |= (1<<PD6); _delay_us(0.4); PORTD &= ~(1<<PD6); _delay_us(.85);} // delay_cycles (3); // Bit '1'   
    else
-   { PORTD |= (1<<PD6); _delay_us(0.8); PORTD &= ~(1<<PD6); _delay_us(.45)} // delay_cycles (6); // Bit '0'   
+   { PORTD |= (1<<PD6); _delay_us(0.8); PORTD &= ~(1<<PD6); _delay_us(.45);} // delay_cycles (6); // Bit '0'   
 }
 
 void neoInit (void)
 {
-   neoGreen = 0; neoBlue = 0; neoRed = 64;
+   NeoGreen = 0; NeoBlue = 0; NeoRed = 64;
 }
 void neoDraw (void)
 {
-   signed int8 bitCount;
+   uint8_t bitCount;
    for (bitCount = 7; bitCount >= 0; bitCount--)      
       neoBit((NeoGreen >> bitCount)%2);      
    for (bitCount = 7; bitCount >= 0; bitCount--)           
-      neoBit((neoRed >> bitCount)%2);            
+      neoBit((NeoRed >> bitCount)%2);            
    for (bitCount = 7; bitCount >= 0; bitCount--)      
-      neoBit((neoBlue >> bitCount)%2);      
+      neoBit((NeoBlue >> bitCount)%2);      
    PORTD &= ~(1<<PD6);
 }
 
@@ -166,13 +164,13 @@ int main(void)
          putchar('a');
          putchar('\n');
          if (ch == '5') {
-           NeoGreen = 255; neoBlue = 0; neoRed = 0;
+           NeoGreen = 255; NeoBlue = 0; NeoRed = 0;
          } else if (ch == '6') {
-           NeoGreen = 0; neoBlue = 255; neoRed = 0;
+           NeoGreen = 0; NeoBlue = 255; NeoRed = 0;
          } else if (ch == '7') {
-           NeoGreen = 0; neoBlue = 0; neoRed = 255;
+           NeoGreen = 0; NeoBlue = 0; NeoRed = 255;
          } else if (ch == '8') {
-           NeoGreen = 0; neoBlue = 0; neoRed = 0;
+           NeoGreen = 0; NeoBlue = 0; NeoRed = 0;
          }
          neoDraw();
       } else {

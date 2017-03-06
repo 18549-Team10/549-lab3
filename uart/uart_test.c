@@ -13,6 +13,10 @@
 #define BAUD 115200
 #include <util/setbaud.h>
 
+unsigned uint8_t neoGreen;
+unsigned uint8_t neoBlue;
+unsigned uint8_t neoRed;
+
 void uart_init(void) {
    UBRR0H = UBRRH_VALUE;
    UBRR0L = UBRRL_VALUE;
@@ -81,6 +85,30 @@ void interrupt22 adcInterrupt(void) {
 }
 */
 
+void neoBit (int bit) // TODO: revisit delay_cycles values
+{
+   if (bit == 1)
+   { output_high (NeoPin); delay_cycles (6); output_low (NeoPin); } // delay_cycles (3); // Bit '1'   
+   else
+   { output_high (NeoPin); delay_cycles (3); output_low (NeoPin); } // delay_cycles (6); // Bit '0'   
+}
+
+void neoInit (void)
+{
+   neoGreen = 0; neoBlue = 0; neoRed = 64;
+}
+void neoDraw (void)
+{
+   signed int8 bitCount;
+   for (bitCount = 7; bitCount >= 0; bitCount--)      
+      neoBit(bit_test(neoGreen, bitCount));      
+   for (bitCount = 7; bitCount >= 0; bitCount--)           
+      neoBit(bit_test(neoRed, bitCount));            
+   for (bitCount = 7; bitCount >= 0; bitCount--)      
+      neoBit(bit_test(neoBlue, bitCount));      
+   output_low (neoPin);
+}
+
 int main(void)
 {
 
@@ -120,7 +148,7 @@ int main(void)
    ** port data while blinking LED */
   printf("Hello world!\r\n");
   pwm_init();
-  struct adafruit_NeoPixel *led = adafruit_NeoPixelInit(1, 6, NEO_GRB + NEO_KHZ800);
+  neoInit();
   while(1) {
       ch = getchar();
       //PORTD |= 1<<PD6; //just see if we get light
@@ -136,18 +164,15 @@ int main(void)
          putchar('a');
          putchar('\n');
          if (ch == '5') {
-           neoPixel_setPixelColor(led,0,255,0,0);
-           neoPixel_show(led);
+           neoGreen = 255; neoBlue = 0; neoRed = 0;
          } else if (ch == '6') {
-           neoPixel_setPixelColor(led,0,0,255,0);
-           neoPixel_show(led);
+           neoGreen = 0; neoBlue = 255; neoRed = 0;
          } else if (ch == '7') {
-           neoPixel_setPixelColor(led,0,0,0,255);
-           neoPixel_show(led);
+           neoGreen = 0; neoBlue = 0; neoRed = 255;
          } else if (ch == '8') {
-           neoPixel_setPixelColor(led,0,0,0,0);
-           neoPixel_show(led);
-            }
+           neoGreen = 0; neoBlue = 0; neoRed = 0;
+         }
+         neoDraw();
       } else {
          putchar('b');
       }

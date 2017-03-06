@@ -13,6 +13,12 @@
 #define BAUD 115200
 #include <util/setbaud.h>
 
+<<<<<<< HEAD
+=======
+uint8_t TIMER_COUNTER = 0;
+uint32_t COLOR = 0;
+
+>>>>>>> 553007ded2e99c6079f2a9e83c2ef5265c44350d
 void uart_init(void) {
    UBRR0H = UBRRH_VALUE;
    UBRR0L = UBRRL_VALUE;
@@ -61,7 +67,7 @@ void pwm_init(void){
   TIMSK0 |= (1<<OCIE0A); //Enable interrupts
 }
 
-ISR(TIM0_COMPA_vect , ISR_NAKED) {
+ISR(TIMER0_COMPA_vect , ISR_NAKED) {
   if(OCR0A == 0x6)
   {
     OCR0A = 0x4;
@@ -133,41 +139,38 @@ int main(void)
   /* Print hello and then echo serial
    ** port data while blinking LED */
   printf("Hello world!\r\n");
-
   pwm_init();
-
   adafruit_NeoPixel led = adafruit_NeoPixel(LED_COUNT, PIN, NEO_GRB + NEO_KHZ800);
   while(1) {
-    ch = getchar();
-    PORTD |= 1<<PD6; //just see if we get light
-    if (mode == SENSOR_MODE) {
-      putchar('s');
-      /*float temp_val = getTemp();
-        int float_size = 48;
-        char[float_size] temp_val_string;
-        snprintf(temp_val_string, float_size, "%f",temp_val);
-        for (i = 0; i < float_size; i++) putch(temp_val_string[i]);
-        putch('\n');*/
-    } else if (mode == ACTUATOR_MODE) {
-      putchar('a');
-      putchar('\n');
-      if (ch == '5') {
-        neoPixel_setPixelColor(led,0,RED);
-        neoPixel_show(led);
-      } else if (ch == '6') {
-        neoPixel_setPixelColor(led,0,GREEN);
-        neoPixel_show(led);
-      } else if (ch == '7') {
-        neoPixel_setPixelColor(led,0,BLUE);
-        neoPixel_show(led);
-      } else if (ch == '8') {
-        neoPixel_setPixelColor(led,0,0);
-        neoPixel_show(led);
+      ch = getchar();
+      //PORTD |= 1<<PD6; //just see if we get light
+      if (mode == SENSOR_MODE) {
+         putchar('s');
+         /*float temp_val = getTemp();
+         int float_size = 48;
+         char[float_size] temp_val_string;
+         snprintf(temp_val_string, float_size, "%f",temp_val);
+         for (i = 0; i < float_size; i++) putch(temp_val_string[i]);
+         putch('\n');*/
+      } else if (mode == ACTUATOR_MODE) {
+         putchar('a');
+         putchar('\n');
+         if (ch == '5') {
+           neoPixel_setPixelColor(led,0,RED);
+           neoPixel_show(led);
+         } else if (ch == '6') {
+           neoPixel_setPixelColor(led,0,GREEN);
+           neoPixel_show(led);
+         } else if (ch == '7') {
+           neoPixel_setPixelColor(led,0,BLUE);
+           neoPixel_show(led);
+         } else if (ch == '8') {
+           neoPixel_setPixelColor(led,0,0);
+           neoPixel_show(led);
+            }
+      } else {
+         putchar('b');
       }
-
-    } else {
-      putchar('b');
-    }
 
     /* A bunch of if...else if... gives smaller code than switch...case ! */
     if (ch=='2') {

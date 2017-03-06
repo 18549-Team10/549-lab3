@@ -90,11 +90,6 @@ void interrupt22 adcInterrupt(void) {
 }
 */
 
-void c_function(Adafruit_NeoPixel* Adafruit_NeoPixel)
-{
-  cplusplus_callback_function(Adafruit_NeoPixel);
-}
-
 int main(void)
 {
 

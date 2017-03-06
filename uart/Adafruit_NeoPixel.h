@@ -76,11 +76,6 @@ class Adafruit_NeoPixel {
 #endif
 
 };
-#else
-  typedef
-    struct Adafruit_NeoPixel
-      Adafruit_NeoPixel;
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -88,11 +83,10 @@ extern "C" {
 
 struct adafruit_NeoPixel;
 
-struct adafruit_NeoPixel* adafruit_NeoPixel(uint16_t n, uint8_t p=6, uint8_t t=NEO_GRB + NEO_KHZ800);
+struct adafruit_NeoPixel* adafruit_NeoPixel(uint16_t n, uint8_t p, uint8_t t=NEO_GRB + NEO_KHZ800);
 void neoPixel_begin(void);
 void neoPixel_show(void);
 void neoPixel_setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b);
-void neoPixel_setPixelColor(uint16_t n, uint32_t c);
 void neoPixel_setBrightness(uint8_t);
 uint16_t neoPixel_numPixels(void);
 static uint32_t neoPixel_Color(uint8_t r, uint8_t g, uint8_t b);

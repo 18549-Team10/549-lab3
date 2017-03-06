@@ -928,7 +928,7 @@ void Adafruit_NeoPixel::setBrightness(uint8_t b) {
 }
 
 
-struct adafruit_NeoPixel* adafruit_NeoPixel(uint16_t n, uint8_t p, uint8_t t=NEO_GRB + NEO_KHZ800){
+struct adafruit_NeoPixel* adafruit_NeoPixel(uint16_t n, uint8_t p, uint8_t t){
   adafruit_NeoPixel *a = TO_C(Adafruit_NeoPixel(n,p,t));
   return a;
 }

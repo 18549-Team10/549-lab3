@@ -23,8 +23,7 @@
 #if (ARDUINO >= 100)
  #include <Arduino.h>
 #else
- #include <WProgram.h>
- #include <pins_arduino.h>
+ #include "pins_arduino.h"
 #endif
 
 // 'type' flags for LED pixels (third parameter to constructor):

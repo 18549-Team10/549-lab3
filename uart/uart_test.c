@@ -9,7 +9,6 @@
 #include <stdio.h>
 
 #include "Adafruit_NeoPixel.h"
-#include "Adafruit_NeoPixel.cpp"
 
 #define BAUD 115200
 #include <util/setbaud.h>

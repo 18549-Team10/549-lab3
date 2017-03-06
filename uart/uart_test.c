@@ -13,9 +13,11 @@
 #define BAUD 115200
 #include <util/setbaud.h>
 
-unsigned uint8_t neoGreen;
-unsigned uint8_t neoBlue;
-unsigned uint8_t neoRed;
+#use delay(clock=48000000,crystal=20000000)
+
+uint8_t NeoGreen;
+uint8_t NeoBlue;
+uint8_t NeoRed;
 
 void uart_init(void) {
    UBRR0H = UBRRH_VALUE;
@@ -88,9 +90,9 @@ void interrupt22 adcInterrupt(void) {
 void neoBit (int bit) // TODO: revisit delay_cycles values
 {
    if (bit == 1)
-   { output_high (NeoPin); delay_cycles (6); output_low (NeoPin); } // delay_cycles (3); // Bit '1'   
+   { PORTD |= (1<<PD6); _delay_us(0.4); PORTD &= ~(1<<PD6); _delay_us(.85)} // delay_cycles (3); // Bit '1'   
    else
-   { output_high (NeoPin); delay_cycles (3); output_low (NeoPin); } // delay_cycles (6); // Bit '0'   
+   { PORTD |= (1<<PD6); _delay_us(0.8); PORTD &= ~(1<<PD6); _delay_us(.45)} // delay_cycles (6); // Bit '0'   
 }
 
 void neoInit (void)
@@ -101,12 +103,12 @@ void neoDraw (void)
 {
    signed int8 bitCount;
    for (bitCount = 7; bitCount >= 0; bitCount--)      
-      neoBit(bit_test(neoGreen, bitCount));      
+      neoBit((NeoGreen >> bitCount)%2);      
    for (bitCount = 7; bitCount >= 0; bitCount--)           
-      neoBit(bit_test(neoRed, bitCount));            
+      neoBit((neoRed >> bitCount)%2);            
    for (bitCount = 7; bitCount >= 0; bitCount--)      
-      neoBit(bit_test(neoBlue, bitCount));      
-   output_low (neoPin);
+      neoBit((neoBlue >> bitCount)%2);      
+   PORTD &= ~(1<<PD6);
 }
 
 int main(void)
@@ -164,13 +166,13 @@ int main(void)
          putchar('a');
          putchar('\n');
          if (ch == '5') {
-           neoGreen = 255; neoBlue = 0; neoRed = 0;
+           NeoGreen = 255; neoBlue = 0; neoRed = 0;
          } else if (ch == '6') {
-           neoGreen = 0; neoBlue = 255; neoRed = 0;
+           NeoGreen = 0; neoBlue = 255; neoRed = 0;
          } else if (ch == '7') {
-           neoGreen = 0; neoBlue = 0; neoRed = 255;
+           NeoGreen = 0; neoBlue = 0; neoRed = 255;
          } else if (ch == '8') {
-           neoGreen = 0; neoBlue = 0; neoRed = 0;
+           NeoGreen = 0; neoBlue = 0; neoRed = 0;
          }
          neoDraw();
       } else {

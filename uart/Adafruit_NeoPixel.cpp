@@ -929,7 +929,7 @@ void Adafruit_NeoPixel::setBrightness(uint8_t b) {
 
 
 struct adafruit_NeoPixel* adafruit_NeoPixelInit(uint16_t n, uint8_t p, uint8_t t){
-  adafruit_NeoPixel *a = TO_C(Adafruit_NeoPixel(n,p,t));
+  struct adafruit_NeoPixel *a = TO_C(Adafruit_NeoPixel(n,p,t));
   return a;
 }
 

@@ -44,6 +44,8 @@ int led;
 //8000000/(1/.8e-6) = 6.4
 #define HIGH1 0x6
 #define LOW1 0x4
+#define HIGH0 0x4
+#define LOW0 0x6
 
 void pwm_init(void){
   DDRD |= (1 << DDD6);// && (1 << DD;
@@ -56,32 +58,36 @@ void pwm_init(void){
   //PWM setup
   //TCCR0A |= 0x7; //Set PWM fast
 
-  OCR0A = HIGH1; //Set TOP
+  //OCR0A = HIGH1; //Set TOP
+  OCR0A = LOW0; //Set TOP
   TCCR0A |= (1 << COM0A0);
+
   TCCR0A |= (1 << WGM01);
   TCCR0A &= ~(1 << WGM00);
   TCCR0A &= ~(1 << WGM02);
-  TCCR0A |= (1 << FOC0A);
 
-  TCCR0A |= (1 << CS00);
-  TCCR0A &= ~(1 << CS01);
-  TCCR0A &= ~(1 << CS02);
+  //Forces compare
+  //TCCR0A |= (1 << FOC0A);
+
+  TCCR0B |= (1 << CS00);
+  TCCR0B &= ~(1 << CS01);
+  TCCR0B &= ~(1 << CS02);
 
   PRR &= ~(1 << PRTIM0);
   TIMSK0 |= (1 << OCIE0A); //Enable interrupts
 }
 
 ISR(TIMER0_COMPA_vect , ISR_NAKED) {
-  if(OCR0A == HIGH1)
+  if(OCR0A == LOW0)
   {
-    PORTB &= ~(1<<0);
-    OCR0A = LOW1;
+    //OCR0A = LOW1;
+    OCR0A = HIGH0;
   }
   else
   {
-    OCR0A = HIGH1;
+    //OCR0A = HIGH1;
+    OCR0A = LOW0;
   }
-  PORTB |= (1<<0);
   //TIMSK0 |= (1 << OCIE0A); //Enable interrupts
   //TIFR0 |=  0x2;
   reti();

@@ -63,7 +63,7 @@ void pwm_init(void){
   TIMSK0 |= (1<<OCIE0A); //Enable interrupts
 }
 
-ISR(TIM0_COMPA_vect , ISR_NAKED) {
+ISR(TIMER0_COMPA_vect , ISR_NAKED) {
   if(OCR0A == 0x6)
   {
     OCR0A = 0x4;
@@ -130,10 +130,8 @@ int main(void)
   /* Print hello and then echo serial
    ** port data while blinking LED */
    printf("Hello world!\r\n");
-   colorReset();
    while(1) {
       ch = getchar();
-      colorReset();
       //PORTD |= 1<<PD6; //just see if we get light
       if (mode == SENSOR_MODE) {
          putchar('s');

@@ -55,7 +55,8 @@ void pwm_init(void){
   //8000000/(1/.8e-6) = 6.4
   OCR0A = 0x6; //Set TOP
   PORTD |= (1<<PD6); //Set output to 1
-  TCCR0A |= 0x40; //Set toggle mode
+  TCCR0A |= (1 << COM0A0);
+  //TCCR0A |= 0x40; //Set toggle mode
 
   TCNT0 = 0;
   TIMSK0 |= (1<<OCIE0A); //Enable interrupts

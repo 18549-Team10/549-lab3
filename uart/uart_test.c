@@ -13,12 +13,6 @@
 #define BAUD 115200
 #include <util/setbaud.h>
 
-<<<<<<< HEAD
-=======
-uint8_t TIMER_COUNTER = 0;
-uint32_t COLOR = 0;
-
->>>>>>> 553007ded2e99c6079f2a9e83c2ef5265c44350d
 void uart_init(void) {
    UBRR0H = UBRRH_VALUE;
    UBRR0L = UBRRL_VALUE;

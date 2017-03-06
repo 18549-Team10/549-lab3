@@ -118,16 +118,12 @@ int main(void)
          putchar('\n');
          if (ch == '5') {
             COLOR = 255<<16;
-            COLOR_COUNTER = 24;
          } else if (ch == '6') {
             COLOR = 255<<8;
-            COLOR_COUNTER = 24;
          } else if (ch == '7') {
             COLOR = 255;
-            COLOR_COUNTER = 24;
          } else if (ch == '8') {
             COLOR = 0;
-            COLOR_COUNTER = 24;
          }
 
       } else {

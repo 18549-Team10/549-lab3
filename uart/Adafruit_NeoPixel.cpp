@@ -940,3 +940,22 @@ void neoPixel_begin(adafruit_NeoPixel *a) {
 void neoPixel_show(adafruit_NeoPixel *a) {
   TO_CPP(a).show();
 }
+
+void neoPixel_setPixelColor(adafruit_NeoPixel *a, uint16_t n, uint8_t r, uint8_t g, uint8_t b) {
+  TO_CPP(a).setPixelColor(n,r,g,b); 
+}
+
+void neoPixel_setBrightness(adafruit_NeoPixel *a, uint8_t) {
+  TO_CPP(a).setBrightness(t); 
+}
+
+uint16_t neoPixel_numPixels(adafruit_NeoPixel *a) {
+  TO_CPP(a).numPixels();
+}
+static uint32_t neoPixel_Color(adafruit_NeoPixel *a, uint8_t r, uint8_t g, uint8_t b) {
+  TO_CPP(a).Color(r,g,b);
+}
+
+uint32_t neoPixel_getPixelColor(adafruit_NeoPixel *a, uint16_t n) {
+  TO_CPP(a).getPixelColor(n);
+}

@@ -43,12 +43,39 @@ FILE uart_output = FDEV_SETUP_STREAM(uart_putchar, NULL, _FDEV_SETUP_WRITE);
 FILE uart_input = FDEV_SETUP_STREAM(NULL, uart_getchar, _FDEV_SETUP_READ);
 FILE uart_io = FDEV_SETUP_STREAM(uart_putchar, uart_getchar, _FDEV_SETUP_RW);
 
-void colorReset(void) {
-   PORTD &= ~(1<<PD6);
-   //sleep(400);
+void pwm_init(void){
+  DDRD |= (1 << DDD6);
+  // PD6 is now an output
+
+  //Reset
+  PORTD &= ~(1<<PD6);
+  _delay_us(50);
+
+  //PWM setup
+  //TCCR0A |= 0x7; //Set PWM fast
+
+  //8000000/(1/.8e-6) = 6.4
+  OCR0A = 0x6; //Set TOP
+  PORTD |= (1<<PD6); //Set output to 1
+  TCCR0A |= 0x40; //Set toggle mode
+
+  TCNT0 = 0;
+  TIMSK0 |= (1<<OCIE0A); //Enable interrupts
 }
+
+ISR(TIM0_COMPA_vect , ISR_NAKED) {
+  if(OCR0A == 0x6)
+  {
+    OCR0A = 0x4;
+  }
+  else
+  {
+    OCR0A = 0x6;
+  }
+}
+
 /*
-ISR(TIMER0_OVF_vect, ISR_NAKED) { 
+ISR(TIMER0_OVF_vect, ISR_NAKED) {
    TIMER_COUNTER = !TIMER_COUNTER;
    if (TIMER_COUNTER && (COLOR_COUNTER > 0)) {
       PORTD = COLOR%2;
@@ -68,37 +95,39 @@ void interrupt22 adcInterrupt(void) {
 int main(void)
 {
 
-   /* Setup serial port */
-   uart_init();
-   stdout = &uart_output;
-   stdin  = &uart_input;
+  /* Setup serial port */
+  uart_init();
+  stdout = &uart_output;
+  stdin  = &uart_input;
 
-   uint8_t SENSOR_MODE = 0;
-   uint8_t ACTUATOR_MODE = 1;
-   uint8_t BOTH_MODE = 2;
-   uint8_t mode = ACTUATOR_MODE;
-   
+  uint8_t SENSOR_MODE = 0;
+  uint8_t ACTUATOR_MODE = 1;
+  uint8_t BOTH_MODE = 2;
+  uint8_t mode = ACTUATOR_MODE;
 
-   char ch;
 
-   // Setup ports
-   DDRB |= (1<<1) | (1<<0);
-   PORTB |= (1<<0);
-   PORTB &= ~(1<<1);
+  char ch;
 
-   // enable interrupts
-   //TIMSK1 |= 1;
+  // Setup ports
+  DDRB |= (1<<1) | (1<<0);
+  PORTB |= (1<<0);
+  PORTB &= ~(1<<1);
 
-   // ADC interrupt
-   //ADATE |= 1;
+  // enable interrupts
+  //TIMSK1 |= 1;
 
-   // Trigger select bits for ADC
-/*  
-   ADTS2 |= 0;
-   ADTS1 |= 0;
-   ADTS0 |= 0;
-*/
-   /* Print hello and then echo serial
+  // ADC interrupt
+  //ADATE |= 1;
+
+  // Trigger select bits for ADC
+  /*
+  ADTS2 |= 0;
+  ADTS1 |= 0;
+  ADTS0 |= 0;
+  */
+
+
+  /* Print hello and then echo serial
    ** port data while blinking LED */
    printf("Hello world!\r\n");
    colorReset();
@@ -135,13 +164,13 @@ int main(void)
          putchar('b');
       }
 
-      /* A bunch of if...else if... gives smaller code than switch...case ! */
-      if (ch=='2') {
-         mode = SENSOR_MODE;
-      } else if (ch=='3') {
-         mode = ACTUATOR_MODE;
-      } else if (ch == '4') {
-         mode = BOTH_MODE;
-      }
-   }
+    /* A bunch of if...else if... gives smaller code than switch...case ! */
+    if (ch=='2') {
+      mode = SENSOR_MODE;
+    } else if (ch=='3') {
+      mode = ACTUATOR_MODE;
+    } else if (ch == '4') {
+      mode = BOTH_MODE;
+    }
+  }
 }

@@ -18,6 +18,7 @@
 
 #ifndef ADAFRUIT_NEOPIXEL_H
 #define ADAFRUIT_NEOPIXEL_H
+#endif
 
 #if (ARDUINO >= 100)
  #include <Arduino.h>
@@ -83,7 +84,7 @@ extern "C" {
 
 struct adafruit_NeoPixel;
 
-struct adafruit_NeoPixel* adafruit_NeoPixel(uint16_t n, uint8_t p, uint8_t t=NEO_GRB + NEO_KHZ800);
+struct adafruit_NeoPixel* adafruit_NeoPixel(uint16_t n, uint8_t p, uint8_t t);
 void neoPixel_begin(void);
 void neoPixel_show(void);
 void neoPixel_setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b);

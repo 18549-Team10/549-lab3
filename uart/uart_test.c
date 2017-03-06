@@ -9,6 +9,7 @@
 #include <stdio.h>
 
 #include "Adafruit_NeoPixel.h"
+#include "Adafruit_NeoPixel.cpp"
 
 #define BAUD 115200
 #include <util/setbaud.h>
@@ -129,7 +130,7 @@ int main(void)
    ** port data while blinking LED */
   printf("Hello world!\r\n");
   pwm_init();
-  adafruit_NeoPixel led = adafruit_NeoPixel(LED_COUNT, PIN, NEO_GRB + NEO_KHZ800);
+  adafruit_NeoPixel *led = adafruit_NeoPixel(LED_COUNT, PIN, NEO_GRB + NEO_KHZ800);
   while(1) {
       ch = getchar();
       //PORTD |= 1<<PD6; //just see if we get light

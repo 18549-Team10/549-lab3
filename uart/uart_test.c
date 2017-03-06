@@ -136,7 +136,7 @@ int main(void)
 
   pwm_init();
 
-  Adafruit_NeoPixel led = Adafruit_NeoPixel(LED_COUNT, PIN, NEO_GRB + NEO_KHZ800);
+  adafruit_NeoPixel led = adafruit_NeoPixel(LED_COUNT, PIN, NEO_GRB + NEO_KHZ800);
   while(1) {
     ch = getchar();
     PORTD |= 1<<PD6; //just see if we get light
@@ -152,17 +152,17 @@ int main(void)
       putchar('a');
       putchar('\n');
       if (ch == '5') {
-        led.setPixelColor(0,RED);
-        led.show();
+        neoPixel_setPixelColor(led,0,RED);
+        neoPixel_show(led);
       } else if (ch == '6') {
-        led.setPixelColor(0,BLUE);
-        led.show();
+        neoPixel_setPixelColor(led,0,GREEN);
+        neoPixel_show(led);
       } else if (ch == '7') {
-        led.setPixelColor(0,GREEN);
-        led.show();
+        neoPixel_setPixelColor(led,0,BLUE);
+        neoPixel_show(led);
       } else if (ch == '8') {
-        led.setPixelColor(0,0);
-        led.show();
+        neoPixel_setPixelColor(led,0,0);
+        neoPixel_show(led);
       }
 
     } else {

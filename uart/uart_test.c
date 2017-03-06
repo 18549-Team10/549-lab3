@@ -8,7 +8,6 @@
 #include <util/delay.h>
 #include <stdio.h>
 
-#include "Adafruit_NeoPixel.h"
 
 #define BAUD 115200
 #include <util/setbaud.h>
@@ -41,8 +40,13 @@ FILE uart_output = FDEV_SETUP_STREAM(uart_putchar, NULL, _FDEV_SETUP_WRITE);
 FILE uart_input = FDEV_SETUP_STREAM(NULL, uart_getchar, _FDEV_SETUP_READ);
 FILE uart_io = FDEV_SETUP_STREAM(uart_putchar, uart_getchar, _FDEV_SETUP_RW);
 
+int led;
+//8000000/(1/.8e-6) = 6.4
+#define HIGH1 0x6
+#define LOW1 0x4
+
 void pwm_init(void){
-  DDRD |= (1 << DDD6);
+  DDRD |= (1 << DDD6);// && (1 << DD;
   // PD6 is now an output
 
   //Reset
@@ -52,25 +56,35 @@ void pwm_init(void){
   //PWM setup
   //TCCR0A |= 0x7; //Set PWM fast
 
-  //8000000/(1/.8e-6) = 6.4
-  OCR0A = 0x6; //Set TOP
-  PORTD |= (1<<PD6); //Set output to 1
+  OCR0A = HIGH1; //Set TOP
   TCCR0A |= (1 << COM0A0);
-  //TCCR0A |= 0x40; //Set toggle mode
+  TCCR0A |= (1 << WGM01);
+  TCCR0A &= ~(1 << WGM00);
+  TCCR0A &= ~(1 << WGM02);
+  TCCR0A |= (1 << FOC0A);
 
-  TCNT0 = 0;
-  TIMSK0 |= (1<<OCIE0A); //Enable interrupts
+  TCCR0A |= (1 << CS00);
+  TCCR0A &= ~(1 << CS01);
+  TCCR0A &= ~(1 << CS02);
+
+  PRR &= ~(1 << PRTIM0);
+  TIMSK0 |= (1 << OCIE0A); //Enable interrupts
 }
 
 ISR(TIMER0_COMPA_vect , ISR_NAKED) {
-  if(OCR0A == 0x6)
+  if(OCR0A == HIGH1)
   {
-    OCR0A = 0x4;
+    PORTB &= ~(1<<0);
+    OCR0A = LOW1;
   }
   else
   {
-    OCR0A = 0x6;
+    OCR0A = HIGH1;
   }
+  PORTB |= (1<<0);
+  //TIMSK0 |= (1 << OCIE0A); //Enable interrupts
+  //TIFR0 |=  0x2;
+  reti();
 }
 
 /*
@@ -111,6 +125,7 @@ int main(void)
   DDRB |= (1<<1) | (1<<0);
   PORTB |= (1<<0);
   PORTB &= ~(1<<1);
+  PORTB &= ~(1<<0);
 
   // enable interrupts
   //TIMSK1 |= 1;
@@ -130,45 +145,18 @@ int main(void)
    ** port data while blinking LED */
   printf("Hello world!\r\n");
   pwm_init();
-  adafruit_NeoPixel led = adafruit_NeoPixel(LED_COUNT, PIN, NEO_GRB + NEO_KHZ800);
-  while(1) {
-      ch = getchar();
-      //PORTD |= 1<<PD6; //just see if we get light
-      if (mode == SENSOR_MODE) {
-         putchar('s');
-         /*float temp_val = getTemp();
-         int float_size = 48;
-         char[float_size] temp_val_string;
-         snprintf(temp_val_string, float_size, "%f",temp_val);
-         for (i = 0; i < float_size; i++) putch(temp_val_string[i]);
-         putch('\n');*/
-      } else if (mode == ACTUATOR_MODE) {
-         putchar('a');
-         putchar('\n');
-         if (ch == '5') {
-           neoPixel_setPixelColor(led,0,RED);
-           neoPixel_show(led);
-         } else if (ch == '6') {
-           neoPixel_setPixelColor(led,0,GREEN);
-           neoPixel_show(led);
-         } else if (ch == '7') {
-           neoPixel_setPixelColor(led,0,BLUE);
-           neoPixel_show(led);
-         } else if (ch == '8') {
-           neoPixel_setPixelColor(led,0,0);
-           neoPixel_show(led);
-            }
-      } else {
-         putchar('b');
-      }
 
-    /* A bunch of if...else if... gives smaller code than switch...case ! */
-    if (ch=='2') {
-      mode = SENSOR_MODE;
-    } else if (ch=='3') {
-      mode = ACTUATOR_MODE;
-    } else if (ch == '4') {
-      mode = BOTH_MODE;
+  sei();
+  int counter = 0;
+  while(1) {
+    if(TCNT0 < 0x7F)
+    {
+      TCNT0 = 0;
+      counter++;
     }
+    if(counter % 0xF000 < 0x7000)
+      PORTB &= ~(1<<1);
+    else
+      PORTB |= (1<<1);
   }
 }

@@ -104,7 +104,8 @@ int main(void)
    colorReset();
    while(1) {
       ch = getchar();
-      PORTD |= 1<<PD6; //just see if we get light
+      colorReset();
+      //PORTD |= 1<<PD6; //just see if we get light
       if (mode == SENSOR_MODE) {
          putchar('s');
          /*float temp_val = getTemp();

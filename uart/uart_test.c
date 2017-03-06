@@ -12,7 +12,6 @@
 #include <util/setbaud.h>
 
 uint8_t TIMER_COUNTER = 0;
-uint32_t COLOR_COUNTER = 0;
 uint32_t COLOR = 0;
 
 void uart_init(void) {
@@ -130,6 +129,7 @@ int main(void)
   /* Print hello and then echo serial
    ** port data while blinking LED */
    printf("Hello world!\r\n");
+   pwm_init();
    while(1) {
       ch = getchar();
       //PORTD |= 1<<PD6; //just see if we get light
@@ -146,16 +146,12 @@ int main(void)
          putchar('\n');
          if (ch == '5') {
             COLOR = 255<<16;
-            COLOR_COUNTER = 24;
          } else if (ch == '6') {
             COLOR = 255<<8;
-            COLOR_COUNTER = 24;
          } else if (ch == '7') {
             COLOR = 255;
-            COLOR_COUNTER = 24;
          } else if (ch == '8') {
             COLOR = 0;
-            COLOR_COUNTER = 24;
          }
 
       } else {
